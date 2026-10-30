@@ -1,25 +1,126 @@
-# CODING AGENTS: READ THIS FIRST
+# Carteira B3 — meus investimentos
 
-This is a **handoff bundle** from Claude Design (claude.ai/design).
+Posição consolidada dos investimentos na B3, calculada a partir do **Extrato de
+Negociação** (01/11/2019 – 28/10/2026) e das **notas de negociação** que você
+adiciona depois. Mostra, por ativo: Nome do Ativo, Saldo, % Alocação,
+Rentabilidade, Preço médio, Último preço (R$) e Qtd. total; em cima, os totais e
+a alocação por classe. Clique num ativo para ver as linhas do extrato e o
+resultado das vendas.
 
-A user mocked up designs in HTML/CSS/JS using an AI design tool, then exported this bundle so a coding agent can implement the designs for real.
+É uma página de desktop, publicada no GitHub Pages. Não tem servidor: tudo o
+que você digita fica salvo só no navegador em que digitou.
 
-## What you should do — IMPORTANT
+Implementado a partir do pacote de handoff do Claude Design, preservado em
+[`design/`](design/) — veja [`design/HANDOFF.md`](design/HANDOFF.md) e a
+conversa em [`design/chats/chat1.md`](design/chats/chat1.md).
 
-**Read the chat transcripts first.** There are 1 chat transcript(s) in `chats/`. The transcripts show the full back-and-forth between the user and the design assistant — they tell you **what the user actually wants** and **where they landed** after iterating. Don't skip them. The final HTML files are the output, but the chat is where the intent lives.
+## Como rodar
 
-**Read `project/Carteira.dc.html` in full.** The user had this file open when they triggered the handoff, so it's almost certainly the primary design they want built. Read it top to bottom — don't skim. Then **follow its imports**: open every file it pulls in (shared components, CSS, scripts) so you understand how the pieces fit together before you start implementing.
+```bash
+npm install
+npm run dev        # desenvolvimento em http://localhost:5173
+npm run build      # gera dist/
+npm run preview    # serve o dist/ em http://localhost:4173
+```
 
-**If anything is ambiguous, ask the user to confirm before you start implementing.** It's much cheaper to clarify scope up front than to build the wrong thing.
+### Publicar
 
-## About the design files
+A cada push na branch `main`, a action em
+[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) roda os testes,
+gera o `dist/` e o envia para a branch `gh-pages`. O GitHub ativa o Pages
+sozinho quando essa branch aparece; o endereço fica em
+`https://<usuário>.github.io/<repositório>/`.
 
-The design medium is **HTML/CSS/JS** — these are prototypes, not production code. Your job is to **recreate them pixel-perfectly** in whatever technology makes sense for the target codebase (React, Vue, native, whatever fits). Match the visual output; don't copy the prototype's internal structure unless it happens to fit.
+### Testes
 
-**Don't render these files in a browser or take screenshots unless the user asks you to.** Everything you need — dimensions, colors, layout rules — is spelled out in the source. Read the HTML and CSS directly; a screenshot won't tell you anything they don't.
+```bash
+npm test                   # regras de cálculo e leitura da nota (node:test)
 
-## Bundle contents
+npm run build
+npx vite preview --port 4173 &
+npm run smoke              # percorre a tela num Chromium; --shots grava as telas
+```
 
-- `README.md` — this file
-- `chats/` — conversation transcripts (read these!)
-- `project/` — the `Bolsa de Valores- xp` project files (HTML prototypes, assets, components)
+O teste de fumaça usa o Playwright. Se o Chromium dele não estiver instalado,
+aponte `PW_CHROMIUM` para um executável do Chrome/Chromium.
+
+## Como a posição é calculada
+
+As regras ficam em [`src/lib/positions.js`](src/lib/positions.js), sem React.
+
+- **Quantidade** = compras − vendas, somando o lote padrão e o fracionário
+  (`ABEV3` + `ABEV3F`). Ativo com quantidade zero sai do cálculo e da lista
+  ("Mostrar zerados" os exibe).
+- **Preço médio** = preço médio ponderado das compras. O resultado realizado de
+  uma venda é `vendido × (preço de venda − preço médio)`.
+- **Saldo** = último preço × quantidade. Sem último preço, usa o preço médio e
+  a rentabilidade fica em "—".
+- **Total investido** = soma de tudo que foi comprado menos tudo que foi
+  vendido, segundo o extrato e as notas, **inclusive** os ativos zerados na tela.
+- **Rentabilidade** (card) considera só os ativos que têm último preço.
+- **Classe** vem do código: `…11` é Fundos, `…32` a `…35` é BDR, o resto é
+  Ações.
+
+### O que você precisa ajustar à mão
+
+O extrato só tem o que passou pelo pregão. Fusões, OPAs, fechamentos de
+capital, vencimentos de renda fixa e grupamentos não aparecem — por isso
+BRML3, CESP6 e CIEL3, por exemplo, ainda constam com quantidade. Use o **✕**
+para zerar o ativo ou digite a quantidade certa em **Qtd. total**. O extrato
+também não traz cotações: digite o **Último preço** de cada ativo.
+
+## Importar notas
+
+A aba **Importar notas** lê o PDF da nota de negociação (testado com o formato
+da XP; a Clear usa o mesmo leiaute da B3), mostra compras e vendas com
+quantidade, preço e valor, e os custos da nota, que podem entrar no preço médio
+(rateados pelo valor de cada operação). Ao clicar em **Adicionar à carteira**,
+quantidade, preço médio e Total investido mudam na hora, e a nota fica listada
+em "Notas adicionadas", de onde pode ser removida.
+
+Notas de pregão **até 28/10/2026** já estão no extrato: a tela avisa que
+adicionar vai duplicar as quantidades. Notas a partir de 29/10/2026 entram sem
+aviso. Uma nota com o mesmo número não entra duas vezes.
+
+O leitor de PDF (pdf.js) só é baixado quando a primeira nota é enviada.
+
+## Atualizar o extrato
+
+Os dados do extrato estão em
+[`src/data/negociacao.json`](src/data/negociacao.json): uma linha por ativo e
+corretora, com `c` (código, `F` no fim para o fracionário), `d1`/`d2` (primeira
+e última negociação), `i` (corretora), `b`/`s` (quantidade comprada e vendida),
+`n` (líquida), `pb`/`ps` (preço médio de compra e de venda) e `nm` (nome). Ao
+trocar o arquivo por um extrato mais recente, ajuste `EXTRATO_FIM` em
+`positions.js` para a nova data final, para que o aviso das notas acompanhe.
+
+## Limites desta versão
+
+- **Os dados ficam só no navegador** (localStorage): preços, quantidades,
+  ativos zerados e notas adicionadas. Outro navegador ou aparelho começa do
+  zero, e limpar os dados do site apaga tudo. Não há backup.
+- **Sem cotações automáticas.** O último preço é digitado.
+- **Leitura de nota testada só com o formato da XP.** Se uma nota não for
+  reconhecida, aparece "nenhuma negociação encontrada".
+
+## Estrutura
+
+```
+src/
+  lib/            regras puras, sem React
+    positions.js    posições, totais, filtro e ordenação; data final do extrato
+    nota.js         leitura do texto de uma nota de negociação
+    pdf.js          pdf.js no navegador (carregado sob demanda)
+    format.js       R$, %, datas e a leitura do que o usuário digita
+    storage.js      localStorage
+  data/
+    negociacao.json o extrato de negociação consolidado
+  screens/        Carteira (totais, alocação, posições) e ImportarNotas
+  components/     Blueprint (a moldura do design system) e Abas
+  styles/
+    industry.css    o design system, copiado do bundle (sem o @import do Google Fonts)
+    app.css         regras da página
+tests/
+  unit/           node:test — cálculo e leitura da nota de exemplo
+  smoke.mjs       Playwright — percorre a tela
+```

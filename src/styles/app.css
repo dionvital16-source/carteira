@@ -1,0 +1,60 @@
+/* Page-level rules from the design (Carteira.dc.html), on top of the Industry
+   system. The page is a 1320px desktop layout on the system's light ground;
+   the positions table scrolls sideways on narrower screens. */
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+}
+
+a {
+  color: var(--color-accent-700);
+}
+a:hover {
+  color: var(--color-accent-800);
+}
+
+/* Prices and quantities line up in the table. */
+input[type='text'].input {
+  font-variant-numeric: tabular-nums;
+}
+
+/* The two page tabs under the title. */
+.aba {
+  appearance: none;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  padding: var(--space-2) 0;
+  cursor: pointer;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: 0.02em;
+  color: var(--color-neutral-700);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.aba[aria-selected='true'] {
+  border-bottom-color: var(--color-accent);
+  color: var(--color-text);
+}
+.aba:hover {
+  color: var(--color-accent-700);
+}
+
+/* Sortable column headers. */
+.th-ordena {
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Column captions inside an expanded position. */
+.op-cab {
+  color: var(--color-neutral-700);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 10px;
+}

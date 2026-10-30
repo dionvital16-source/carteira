@@ -1,0 +1,27 @@
+{
+  "name": "carteira-b3",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Carteira B3 — posição consolidada de investimentos a partir do extrato de negociação e das notas de corretagem",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node --test tests/unit/*.test.mjs",
+    "smoke": "node tests/smoke.mjs"
+  },
+  "dependencies": {
+    "@fontsource/barlow": "^5.2.5",
+    "@fontsource/barlow-condensed": "^5.2.5",
+    "lucide-react": "^1.37.0",
+    "pdfjs-dist": "^5.4.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "playwright": "^1.62.1",
+    "vite": "^5.4.11"
+  }
+}

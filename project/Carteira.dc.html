@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/industry-a5195878-6604-4229-9c35-3a38b01e4f8c/styles.css">
+<script src="_ds/industry-a5195878-6604-4229-9c35-3a38b01e4f8c/_ds_bundle.js"></script>
+<style>body{margin:0;background:var(--color-bg)}a{color:var(--color-accent-700)}a:hover{color:var(--color-accent-800)}input[type=text].input{font-variant-numeric:tabular-nums}</style>
+</helmet>
+<div style="min-height:100vh;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body)">
+  <nav class="nav" style="max-width:1320px;margin:0 auto;padding:var(--space-4) var(--space-6)">
+    <span class="nav-brand">Carteira B3</span>
+    <span style="font-size:13px;color:var(--color-neutral-700)">Dion Luciano Vital Filho</span>
+    <span class="tag tag-neutral">Extrato 01/11/2019 – 28/10/2026</span>
+  </nav>
+
+  <main style="max-width:1320px;margin:0 auto;padding:var(--space-4) var(--space-6) 64px;display:flex;flex-direction:column;gap:var(--space-8)">
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:var(--space-4)">
+      <div>
+        <h6 style="color:var(--color-accent-700);margin-bottom:var(--space-1)">Posição consolidada</h6>
+        <h1 style="margin:0;font-size:48px">Meus investimentos</h1>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:var(--space-6);border-bottom:1px solid var(--color-divider);margin-top:calc(-1 * var(--space-4))">
+      <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="2">
+        <button onClick="{{ t.pick }}" style="appearance:none;background:none;border:none;border-bottom:2px solid {{ t.border }};margin-bottom:-1px;padding:var(--space-2) 0;cursor:pointer;font-family:var(--font-heading);font-weight:600;font-size:18px;letter-spacing:0.02em;color:{{ t.color }};display:flex;align-items:center;gap:var(--space-2)" style-hover="color:var(--color-accent-700)">{{ t.label }}<span class="tag tag-neutral" style="padding:1px 6px;font-size:10px;display:{{ t.badgeDisplay }}">{{ t.badge }}</span></button>
+      </sc-for>
+    </div>
+
+    <sc-if value="{{ isCarteira }}" hint-placeholder-val="{{ true }}">
+
+    <div class="blueprint" style="padding:var(--space-3) var(--space-4);display:flex;gap:var(--space-3);align-items:flex-start;max-width:900px">
+      <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+      <p style="margin:0;font-size:13px;line-height:1.5;color:var(--color-neutral-800);text-wrap:pretty">Posições calculadas pelo Extrato de Negociação da B3 (compras − vendas, lote padrão e fracionário somados). Eventos fora do pregão, como fusões, OPAs, fechamentos de capital e vencimentos de renda fixa, não aparecem no extrato: ajuste a <strong>Qtd. total</strong> ou zere esses ativos. Informe o <strong>Último preço</strong> para calcular saldo e rentabilidade; sem ele, o saldo usa o preço médio. Resultado realizado nas vendas: {{ realizedTotal }}. Tudo fica salvo neste navegador.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--space-6)">
+      <div class="card blueprint" style="padding:var(--space-4)">
+        <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <span class="card-kicker" style="color:var(--color-accent-700)">Saldo total</span>
+        <span style="font-family:var(--font-heading);font-weight:600;font-size:34px;line-height:1.1;font-variant-numeric:tabular-nums">{{ sum.saldo }}</span>
+        <span class="card-meta">{{ sum.pricedLabel }}</span>
+      </div>
+      <div class="card blueprint" style="padding:var(--space-4)">
+        <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <span class="card-kicker" style="color:var(--color-accent-700)">Total investido</span>
+        <span style="font-family:var(--font-heading);font-weight:600;font-size:34px;line-height:1.1;font-variant-numeric:tabular-nums">{{ sum.cost }}</span>
+        <span class="card-meta">{{ sum.costMeta }}</span>
+      </div>
+      <div class="card blueprint" style="padding:var(--space-4)">
+        <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <span class="card-kicker" style="color:var(--color-accent-700)">Rentabilidade</span>
+        <span style="font-family:var(--font-heading);font-weight:600;font-size:34px;line-height:1.1;font-variant-numeric:tabular-nums">{{ sum.rentPct }}</span>
+        <span class="card-meta">{{ sum.rentBrl }} sobre os ativos com preço</span>
+      </div>
+      <div class="card blueprint" style="padding:var(--space-4)">
+        <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <span class="card-kicker" style="color:var(--color-accent-700)">Ativos</span>
+        <span style="font-family:var(--font-heading);font-weight:600;font-size:34px;line-height:1.1;font-variant-numeric:tabular-nums">{{ sum.count }}</span>
+        <span class="card-meta">{{ sum.zeroedLabel }}</span>
+      </div>
+    </div>
+
+    <section style="display:flex;flex-direction:column;gap:var(--space-3)">
+      <h4 style="margin:0">Alocação por classe</h4>
+      <div style="display:flex;height:28px;border:1px solid var(--color-divider);background:var(--color-bg)">
+        <sc-for list="{{ classes }}" as="c" hint-placeholder-count="3">
+          <div title="{{ c.name }}" style="height:100%;width:{{ c.w }};background:{{ c.color }}"></div>
+        </sc-for>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:var(--space-3) var(--space-8)">
+        <sc-for list="{{ classes }}" as="c" hint-placeholder-count="3">
+          <div style="display:flex;align-items:center;gap:var(--space-2);font-size:13px">
+            <span style="width:10px;height:10px;background:{{ c.color }}"></span>
+            <span style="font-weight:500">{{ c.name }}</span>
+            <span style="color:var(--color-neutral-700);font-variant-numeric:tabular-nums">{{ c.pct }} · {{ c.val }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:var(--space-4)">
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-3)">
+        <h4 style="margin:0;margin-right:auto">Posições</h4>
+        <div class="seg">
+          <sc-for list="{{ filters }}" as="f" hint-placeholder-count="4">
+            <label class="seg-opt"><input type="radio" name="cls" checked="{{ f.active }}" onChange="{{ f.pick }}">{{ f.label }}</label>
+          </sc-for>
+        </div>
+        <input class="input" type="text" placeholder="Buscar ativo" value="{{ q }}" onChange="{{ onQ }}" style="width:200px">
+        <button class="btn btn-ghost" onClick="{{ toggleZeroed }}">{{ zeroedBtn }}</button>
+      </div>
+
+      <div style="overflow-x:auto;border-top:1px solid var(--color-divider)">
+        <table class="table" style="min-width:1040px;font-variant-numeric:tabular-nums">
+          <thead>
+            <tr>
+              <th onClick="{{ sortBy.nome }}" style="cursor:pointer;user-select:none">Nome do Ativo {{ arrows.nome }}</th>
+              <th onClick="{{ sortBy.saldo }}" style="cursor:pointer;user-select:none;text-align:right">Saldo {{ arrows.saldo }}</th>
+              <th onClick="{{ sortBy.alloc }}" style="cursor:pointer;user-select:none;text-align:right">% Alocação {{ arrows.alloc }}</th>
+              <th onClick="{{ sortBy.rent }}" style="cursor:pointer;user-select:none;text-align:right">Rentabilidade {{ arrows.rent }}</th>
+              <th onClick="{{ sortBy.pm }}" style="cursor:pointer;user-select:none;text-align:right">Preço médio {{ arrows.pm }}</th>
+              <th style="text-align:right">Último preço (R$)</th>
+              <th style="text-align:right">Qtd. total</th>
+              <th style="width:40px"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{ rows }}" as="r" hint-placeholder-count="8">
+              <tr style="opacity:{{ r.opacity }}">
+                <td style="cursor:pointer" onClick="{{ r.toggle }}">
+                  <div style="display:flex;align-items:center;gap:var(--space-2)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex:none;color:var(--color-neutral-600);transform:{{ r.chev }}"><path d="m9 18 6-6-6-6"></path></svg>
+                    <div style="display:flex;flex-direction:column;min-width:0">
+                      <span style="display:flex;align-items:center;gap:var(--space-2)"><strong style="font-family:var(--font-heading);font-weight:600;font-size:16px;letter-spacing:0.01em">{{ r.tk }}</strong><span class="tag tag-accent" style="padding:1px 6px;font-size:10px">{{ r.cls }}</span></span>
+                      <span style="font-size:12px;color:var(--color-neutral-700);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px">{{ r.name }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td style="text-align:right;font-weight:500">{{ r.saldo }}</td>
+                <td style="text-align:right">
+                  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">
+                    <span>{{ r.alloc }}</span>
+                    <span style="width:64px;height:3px;background:var(--color-neutral-200);display:block"><span style="display:block;height:100%;width:{{ r.allocW }};background:var(--color-accent)"></span></span>
+                  </div>
+                </td>
+                <td style="text-align:right;font-weight:500;color:{{ r.rentColor }}">{{ r.rent }}</td>
+                <td style="text-align:right">{{ r.pm }}</td>
+                <td style="text-align:right"><input class="input" type="text" inputmode="decimal" placeholder="{{ r.pricePh }}" value="{{ r.priceVal }}" onChange="{{ r.onPrice }}" style="width:104px;min-height:30px;padding:4px 8px;text-align:right"></td>
+                <td style="text-align:right"><input class="input" type="text" inputmode="numeric" placeholder="{{ r.qtyPh }}" value="{{ r.qtyVal }}" onChange="{{ r.onQty }}" style="width:96px;min-height:30px;padding:4px 8px;text-align:right"></td>
+                <td style="text-align:right">
+                  <button class="btn btn-ghost btn-icon" title="{{ r.hideTitle }}" onClick="{{ r.onHide }}" style="width:30px;height:30px;color:var(--color-neutral-700)">
+                    <sc-if value="{{ r.hidden }}" hint-placeholder-val="{{ false }}">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5"></path></svg>
+                    </sc-if>
+                    <sc-if value="{{ r.shown }}" hint-placeholder-val="{{ true }}">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+                    </sc-if>
+                  </button>
+                </td>
+              </tr>
+              <sc-if value="{{ r.open }}" hint-placeholder-val="{{ false }}">
+                <tr>
+                  <td colSpan="8" style="background:var(--color-neutral-100);padding:var(--space-3) var(--space-4) var(--space-4) 40px">
+                    <div style="display:grid;grid-template-columns:70px 170px minmax(0,1fr) 70px 70px 70px 100px 100px;gap:4px var(--space-4);font-size:12px;max-width:960px">
+                      <span style="color:var(--color-neutral-700);text-transform:uppercase;letter-spacing:0.08em;font-size:10px">Código</span>
+                      <span style="color:var(--color-neutral-700);text-transform:uppercase;letter-spacing:0.08em;font-size:10px">Período</span>
+                      <span style="color:var(--color-neutral-700);text-transform:uppercase;letter-spacing:0.08em;font-size:10px">Instituição</span>
+                      <span style="color:var(--color-neutral-700);text-transform:uppercase;letter-spacing:0.08em;font-size:10px;text-align:right">Compra</span>
+                      <span style="color:var(--color-neutral-700);text-transform:uppercase;letter-spacing:0.08em;font-size:10px;text-align:right">Venda</span>
+                      <span style="color:var(--color-neutral-700);text-transform:uppercase;letter-spacing:0.08em;font-size:10px;text-align:right">Líquida</span>
+                      <span style="color:var(--color-neutral-700);text-transform:uppercase;letter-spacing:0.08em;font-size:10px;text-align:right">PM compra</span>
+                      <span style="color:var(--color-neutral-700);text-transform:uppercase;letter-spacing:0.08em;font-size:10px;text-align:right">PM venda</span>
+                      <sc-for list="{{ r.ops }}" as="o" hint-placeholder-count="2">
+                        <span style="font-weight:500">{{ o.c }}</span><span>{{ o.d }}</span><span>{{ o.i }}</span><span style="text-align:right">{{ o.b }}</span><span style="text-align:right">{{ o.s }}</span><span style="text-align:right">{{ o.n }}</span><span style="text-align:right">{{ o.pb }}</span><span style="text-align:right">{{ o.ps }}</span>
+                      </sc-for>
+                    </div>
+                    <span style="display:block;margin-top:var(--space-2);font-size:12px;color:var(--color-accent-700)">{{ r.realized }}</span>
+                  </td>
+                </tr>
+              </sc-if>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+      <sc-if value="{{ empty }}" hint-placeholder-val="{{ false }}">
+        <p style="color:var(--color-neutral-700);font-size:14px">Nenhum ativo encontrado.</p>
+      </sc-if>
+    </section>
+    </sc-if>
+
+    <sc-if value="{{ isNotas }}" hint-placeholder-val="{{ false }}">
+    <section style="display:flex;flex-direction:column;gap:var(--space-4)">
+      <div>
+        <h4 style="margin:0 0 var(--space-1)">Importar nota de negociação</h4>
+        <p style="margin:0;font-size:13px;color:var(--color-neutral-700)">Leia o PDF da nota da corretora, confira as operações e adicione à carteira. Quantidade e preço médio são atualizados na hora.</p>
+      </div>
+      <label class="blueprint" onDragOver="{{ onDragOver }}" onDragLeave="{{ onDragLeave }}" onDrop="{{ onDrop }}" style="display:flex;align-items:center;justify-content:center;gap:var(--space-3);padding:var(--space-8) var(--space-4);cursor:pointer;border:1px dashed {{ dropBorder }};background:{{ dropBg }}">
+        <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <input type="file" accept="application/pdf,.pdf" multiple onChange="{{ onPick }}" style="position:absolute;opacity:0;width:0;height:0">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M12 18v-6"></path><path d="m9 15 3-3 3 3"></path></svg>
+        <span style="font-size:14px;font-weight:500;color:var(--color-accent-800)">{{ dropLabel }}</span>
+      </label>
+      <sc-if value="{{ noteErr }}" hint-placeholder-val="{{ false }}">
+        <span style="font-size:12px;color:var(--color-text)">{{ noteErr }}</span>
+      </sc-if>
+
+      <sc-for list="{{ pending }}" as="n" hint-placeholder-count="0">
+        <div class="card blueprint" style="padding:var(--space-4);gap:var(--space-3)">
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--space-2) var(--space-4)">
+            <span class="card-title" style="font-size:20px">{{ n.title }}</span>
+            <span class="card-meta">{{ n.file }}</span>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="table" style="min-width:640px;font-variant-numeric:tabular-nums">
+              <thead>
+                <tr><th>C/V</th><th>Ativo</th><th style="text-align:right">Quantidade</th><th style="text-align:right">Preço</th><th style="text-align:right">Valor</th><th style="text-align:right">Preço c/ custos</th></tr>
+              </thead>
+              <tbody>
+                <sc-for list="{{ n.trades }}" as="t" hint-placeholder-count="2">
+                  <tr>
+                    <td><span class="tag tag-accent">{{ t.cv }}</span></td>
+                    <td><div style="display:flex;flex-direction:column"><strong style="font-family:var(--font-heading);font-weight:600;font-size:16px">{{ t.tk }}</strong><span style="font-size:12px;color:var(--color-neutral-700)">{{ t.spec }}</span></div></td>
+                    <td style="text-align:right">{{ t.q }}</td>
+                    <td style="text-align:right">{{ t.p }}</td>
+                    <td style="text-align:right">{{ t.v }}</td>
+                    <td style="text-align:right;font-weight:500">{{ t.pe }}</td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:var(--space-3) var(--space-6)">
+            <span style="font-size:13px">{{ n.fees }}</span>
+            <label class="radio" style="font-size:13px"><input type="checkbox" checked="{{ n.withFees }}" onChange="{{ n.toggleFees }}"><span class="dot" style="border-radius:0"></span>Incluir custos no preço médio</label>
+          </div>
+          <sc-if value="{{ n.hasWarn }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;gap:var(--space-2);align-items:flex-start;padding:var(--space-2) var(--space-3);background:var(--color-accent-100);font-size:13px;color:var(--color-accent-900)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+              <span>{{ n.warn }}</span>
+            </div>
+          </sc-if>
+          <div style="display:flex;gap:var(--space-2);justify-content:flex-end">
+            <button class="btn btn-secondary" onClick="{{ n.discard }}">Descartar</button>
+            <button class="btn btn-primary blueprint" disabled="{{ n.dup }}" onClick="{{ n.add }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>{{ n.addLabel }}</button>
+          </div>
+        </div>
+      </sc-for>
+
+      <sc-if value="{{ hasNotes }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:var(--space-2)">
+          <h6 style="margin:0;color:var(--color-neutral-700)">Notas adicionadas</h6>
+          <table class="table" style="font-variant-numeric:tabular-nums">
+            <tbody>
+              <sc-for list="{{ notes }}" as="nt" hint-placeholder-count="1">
+                <tr>
+                  <td style="font-weight:500;white-space:nowrap">Nota {{ nt.nota }}</td>
+                  <td style="white-space:nowrap">{{ nt.data }}</td>
+                  <td style="font-size:13px;color:var(--color-neutral-800)">{{ nt.resumo }}</td>
+                  <td style="text-align:right;white-space:nowrap">{{ nt.total }}</td>
+                  <td style="width:40px;text-align:right"><button class="btn btn-ghost btn-icon" title="Remover nota" onClick="{{ nt.remove }}" style="width:30px;height:30px;color:var(--color-neutral-700)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button></td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+      </sc-if>
+    </section>
+    </sc-if>
+  </main>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;ordenacaoPadrao&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;saldo&quot;,&quot;rent&quot;,&quot;nome&quot;,&quot;pm&quot;],&quot;default&quot;:&quot;saldo&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;mostrarZerados&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}">
+const KEY = 'carteira-b3-ov-v1';
+const brl = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+const brlSmall = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 6 });
+const pct = n => (n * 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
+const sgnPct = n => (n > 0 ? '+' : n < 0 ? '−' : '') + pct(Math.abs(n));
+const sgnBrl = n => (n > 0 ? '+' : n < 0 ? '−' : '') + brl.format(Math.abs(n));
+const money = n => (n > 0 && n < 0.01 ? brlSmall : brl).format(n);
+const parse = s => {
+  if (s == null) return null; s = String(s).trim().replace(/R\$\s?/, '');
+  if (!s) return null;
+  if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.');
+  const n = parseFloat(s); return isFinite(n) ? n : null;
+};
+const classOf = t => /^(LCA|CDB)/.test(t) ? 'Renda fixa' : /3[2-5]$/.test(t) ? 'BDR' : /11$/.test(t) ? 'Fundos' : 'Ações';
+const CLS = ['Ações', 'Fundos', 'BDR'];
+const CLS_COLOR = { 'Ações': 'var(--color-accent-800)', 'Fundos': 'var(--color-accent-500)', 'BDR': 'var(--color-accent-300)', 'Renda fixa': 'var(--color-neutral-500)' };
+const fmtDate = d => d.split('-').reverse().join('/');
+const NKEY = 'carteira-b3-notas-v1';
+const EXTRATO_FIM = '2026-10-28';
+const PDF_URL = 'https://cdn.jsdelivr.net/npm/pdf-parse@2.4.5/dist/pdf-parse/web/pdf-parse.es.js';
+const PDF_WORKER = 'https://cdn.jsdelivr.net/npm/pdf-parse@2.4.5/dist/pdf-parse/web/pdf.worker.min.mjs';
+const effPrice = (n, t) => {
+  const sumV = n.trades.reduce((a, x) => a + x.v, 0) || 1;
+  const fee = n.withFees ? n.fees * t.v / sumV : 0;
+  return t.q ? (t.cv === 'C' ? t.v + fee : t.v - fee) / t.q : 0;
+};
+
+class Component extends DCLogic {
+  state = { tab: 'carteira', notes: [], pending: [], busy: false, noteErr: '', drag: false, tx: [], ov: {}, sort: null, dir: -1, cls: 'Todos', q: '', open: {}, showZeroed: null, dlg: false, paste: '', pasteMsg: '' };
+
+  componentDidMount() {
+    try { this.setState({ ov: JSON.parse(localStorage.getItem(KEY) || '{}') }); } catch (e) {}
+    try { this.setState({ notes: JSON.parse(localStorage.getItem(NKEY) || '[]') }); } catch (e) {}
+    fetch('negociacao.json').then(r => r.json()).then(tx => this.setState({ tx }));
+  }
+  saveNotes(notes) { this.setState({ notes }); try { localStorage.setItem(NKEY, JSON.stringify(notes)); } catch (e) {} }
+  noteRows() {
+    return this.state.notes.flatMap(n => n.trades.map(t => {
+      const pe = effPrice(n, t), buy = t.cv === 'C';
+      return { c: t.tk, d1: fmtDate(n.data), d2: fmtDate(n.data), i: `Nota ${n.nota}`, b: buy ? t.q : 0, s: buy ? 0 : t.q, n: buy ? t.q : -t.q, pb: buy ? pe : 0, ps: buy ? 0 : pe, nm: t.spec };
+    }));
+  }
+  async readNote(file) {
+    const { PDFParse } = await import(PDF_URL);
+    PDFParse.setWorker(PDF_WORKER);
+    const parser = new PDFParse({ data: new Uint8Array(await file.arrayBuffer()) });
+    const text = (await parser.getText()).text.replace(/[ \t]+/g, ' ');
+    const nota = (text.match(/N[ºo°]\s*Nota\s+(\d+)/) || [])[1] || '';
+    const dm = text.match(/Data preg[ãa]o\s+(\d{2})\/(\d{2})\/(\d{4})/);
+    const data = dm ? `${dm[3]}-${dm[2]}-${dm[1]}` : '';
+    const re = /\d-BOVESPA\s+([CV])\s+(VISTA|FRACIONARIO|FRACIONÁRIO)\s+(?:\d{2}\/\d{2}\s+)?(.+?)\s+(\d[\d.]*)\s+(\d[\d.]*,\d+)\s+(\d[\d.]*,\d{2})\s+([DC])/g;
+    const trades = []; let m;
+    while ((m = re.exec(text))) {
+      const spec = m[3].replace(/(\s+[@#2DFBTACPHXYLI8]{1,3})+$/, '').trim();
+      const tk = (spec.match(/\b([A-Z]{4}\d{1,2})F?\b/) || [])[1];
+      if (!tk) continue;
+      trades.push({ cv: m[1], tk, spec, q: parse(m[4].replace(/\./g, '')), p: parse(m[5]), v: parse(m[6]) });
+    }
+    const c = trades.filter(t => t.cv === 'C').reduce((a, t) => a + t.v, 0);
+    const v = trades.filter(t => t.cv === 'V').reduce((a, t) => a + t.v, 0);
+    const lm = text.match(/(\d[\d.]*,\d{2})\s+L[íi]quido para\s+\d{2}\/\d{2}\/\d{4}\s+([DC])/);
+    let fees = 0;
+    if (lm) { const liq = parse(lm[1]); fees = Math.max(0, lm[2] === 'D' ? liq - (c - v) : (v - c) - liq); }
+    return { nota, data, trades, fees: Math.round(fees * 100) / 100, withFees: true, file: file.name };
+  }
+  async onFiles(files) {
+    files = [...(files || [])].filter(f => /pdf$/i.test(f.name) || f.type === 'application/pdf');
+    if (!files.length) return;
+    this.setState({ busy: true, noteErr: '' });
+    const pending = [...this.state.pending], errs = [];
+    for (const f of files) {
+      try {
+        const n = await this.readNote(f);
+        if (!n.trades.length) errs.push(`${f.name}: nenhuma negociação encontrada`);
+        else if (!pending.some(p => p.nota === n.nota)) pending.push(n);
+      } catch (e) { errs.push(`${f.name}: não foi possível ler o PDF`); }
+    }
+    this.setState({ pending, busy: false, noteErr: errs.join(' · ') });
+  }
+  saveOv(ov) { this.setState({ ov }); try { localStorage.setItem(KEY, JSON.stringify(ov)); } catch (e) {} }
+  setOv(t, k, v) { const ov = { ...this.state.ov }; ov[t] = { ...(ov[t] || {}), [k]: v }; this.saveOv(ov); }
+
+  positions() {
+    const g = {};
+    for (const r of [...this.state.tx, ...this.noteRows()]) {
+      const t = r.c.replace(/F$/, '');
+      const p = g[t] || (g[t] = { t, n: r.nm, q: 0, b: 0, s: 0, bv: 0, sv: 0, ops: [] });
+      p.q += r.n; p.b += r.b; p.s += r.s; p.bv += r.b * r.pb; p.sv += r.s * r.ps; p.ops.push(r);
+    }
+    return Object.values(g).map(p => {
+      const o = this.state.ov[p.t] || {};
+      const pm = p.b ? p.bv / p.b : 0;
+      p.realized = p.s && p.b ? p.sv - p.s * pm : 0;
+      const qo = parse(o.qty);
+      const qty = qo != null ? qo : p.q;
+      const price = parse(o.price);
+      const cost = pm * qty;
+      const saldo = price != null ? price * qty : cost;
+      const hidden = !!o.hidden || qty <= 0;
+      return { ...p, o, pm, qty, price, cost, saldo, hidden, cls: classOf(p.t), rent: price != null && pm ? price / pm - 1 : null };
+    });
+  }
+
+  renderVals() {
+    const s = this.state;
+    const showZeroed = s.showZeroed ?? (this.props.mostrarZerados ?? false);
+    const sortKey = s.sort || (this.props.ordenacaoPadrao ?? 'saldo');
+    const all = this.positions();
+    const live = all.filter(p => !p.hidden);
+    const total = live.reduce((a, p) => a + p.saldo, 0);
+    const cost = live.reduce((a, p) => a + p.cost, 0);
+    const priced = live.filter(p => p.price != null);
+    const pSaldo = priced.reduce((a, p) => a + p.saldo, 0), pCost = priced.reduce((a, p) => a + p.cost, 0);
+    const zeroed = all.length - live.length;
+
+    const byCls = CLS.map(c => ({ c, v: live.filter(p => p.cls === c).reduce((a, p) => a + p.saldo, 0) })).filter(x => x.v > 0);
+    const classes = byCls.map(x => ({ name: x.c, val: brl.format(x.v), pct: pct(total ? x.v / total : 0), w: (total ? x.v / total * 100 : 0) + '%', color: CLS_COLOR[x.c] }));
+
+    const q = s.q.trim().toUpperCase();
+    let list = all.filter(p => (showZeroed || !p.hidden) && (s.cls === 'Todos' || p.cls === s.cls) && (!q || p.t.includes(q) || p.n.toUpperCase().includes(q)));
+    const val = { nome: p => p.t, saldo: p => p.hidden ? -1 : p.saldo, alloc: p => p.hidden ? -1 : p.saldo, rent: p => p.rent ?? -Infinity, pm: p => p.pm }[sortKey];
+    const dir = s.sort ? s.dir : (sortKey === 'nome' ? 1 : -1);
+    list.sort((a, b) => { const x = val(a), y = val(b); return (x < y ? -1 : x > y ? 1 : 0) * dir; });
+
+    const rows = list.map(p => {
+      const open = !!s.open[p.t];
+      return {
+        tk: p.t.replace(/^(LCA|CDB) /, '$1 · '), name: p.n, cls: p.cls,
+        saldo: p.hidden ? '—' : brl.format(p.saldo),
+        alloc: p.hidden ? '—' : pct(total ? p.saldo / total : 0),
+        allocW: (p.hidden || !total ? 0 : Math.min(100, p.saldo / total * 100 * 4)) + '%',
+        rent: p.rent == null ? '—' : sgnPct(p.rent),
+        rentColor: p.rent == null ? 'var(--color-neutral-600)' : p.rent >= 0 ? 'var(--color-accent-700)' : 'var(--color-text)',
+        pm: money(p.pm),
+        pricePh: p.pm < 0.01 ? p.pm.toLocaleString('pt-BR', { maximumFractionDigits: 6 }) : p.pm.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+        priceVal: p.o.price ?? '', qtyVal: p.o.qty ?? '', qtyPh: p.q.toLocaleString('pt-BR'),
+        onPrice: e => this.setOv(p.t, 'price', e.target.value),
+        onQty: e => this.setOv(p.t, 'qty', e.target.value),
+        hidden: p.hidden, shown: !p.hidden, opacity: p.hidden ? 0.5 : 1,
+        hideTitle: p.hidden ? 'Restaurar' : 'Zerar posição',
+        onHide: () => { if (p.hidden && parse(p.o.qty) === 0) { const ov = { ...s.ov, [p.t]: { ...p.o, qty: '', hidden: false } }; this.saveOv(ov); } else this.setOv(p.t, 'hidden', !p.hidden); },
+        open, chev: open ? 'rotate(90deg)' : 'none',
+        toggle: () => this.setState(st => ({ open: { ...st.open, [p.t]: !st.open[p.t] } })),
+        ops: p.ops.map(o => ({ c: o.c, d: o.d1 === o.d2 ? o.d1 : `${o.d1} – ${o.d2}`, i: o.i === 'XP' ? 'XP Investimentos' : o.i === 'Clear' ? 'Clear Corretora' : o.i, b: o.b.toLocaleString('pt-BR'), s: o.s.toLocaleString('pt-BR'), n: o.n.toLocaleString('pt-BR'), pb: o.b ? money(o.pb) : '—', ps: o.s ? money(o.ps) : '—' })),
+        realized: p.s ? `Resultado realizado nas vendas: ${sgnBrl(p.realized)}` : ''
+      };
+    });
+
+    const mk = k => () => this.setState(st => ({ sort: k, dir: (st.sort || sortKey) === k ? -((st.sort ? st.dir : dir)) : (k === 'nome' ? 1 : -1) }));
+    const ar = k => sortKey === k ? (dir > 0 ? '↑' : '↓') : '';
+    const keys = ['nome', 'saldo', 'alloc', 'rent', 'pm'];
+
+    return {
+      opsCount: s.tx.length,
+      isCarteira: s.tab === 'carteira', isNotas: s.tab === 'notas',
+      tabs: [['carteira', 'Carteira', ''], ['notas', 'Importar notas', s.notes.length ? String(s.notes.length) : '']].map(([id, label, badge]) => ({ label, badge, badgeDisplay: badge ? 'inline-flex' : 'none', border: s.tab === id ? 'var(--color-accent)' : 'transparent', color: s.tab === id ? 'var(--color-text)' : 'var(--color-neutral-700)', pick: () => this.setState({ tab: id }) })),
+      busy: s.busy, noteErr: s.noteErr,
+      dropBorder: s.drag ? 'var(--color-accent)' : 'var(--color-divider)',
+      dropBg: s.drag ? 'var(--color-accent-100)' : 'transparent',
+      dropLabel: s.busy ? 'Lendo nota…' : 'Arraste o PDF da nota de negociação ou clique para escolher',
+      onPick: e => { this.onFiles(e.target.files); e.target.value = ''; },
+      onDragOver: e => { e.preventDefault(); if (!s.drag) this.setState({ drag: true }); },
+      onDragLeave: () => this.setState({ drag: false }),
+      onDrop: e => { e.preventDefault(); this.setState({ drag: false }); this.onFiles(e.dataTransfer.files); },
+      hasPending: s.pending.length > 0,
+      pending: s.pending.map((n, i) => {
+        const dup = s.notes.some(x => x.nota === n.nota);
+        const covered = !dup && n.data && n.data <= EXTRATO_FIM;
+        return {
+          title: `Nota ${n.nota || 's/ nº'} · pregão ${n.data ? fmtDate(n.data) : '—'}`,
+          file: n.file,
+          trades: n.trades.map(t => ({ cv: t.cv === 'C' ? 'Compra' : 'Venda', tk: t.tk, spec: t.spec, q: t.q.toLocaleString('pt-BR'), p: money(t.p), v: brl.format(t.v), pe: money(effPrice(n, t)) })),
+          fees: `Custos da nota: ${brl.format(n.fees)}`,
+          withFees: n.withFees,
+          toggleFees: () => this.setState(st => ({ pending: st.pending.map((x, j) => j === i ? { ...x, withFees: !x.withFees } : x) })),
+          warn: dup ? 'Esta nota já foi adicionada.' : covered ? `Pregão de ${fmtDate(n.data)}: já está no Extrato de Negociação da B3 (até ${fmtDate(EXTRATO_FIM)}). Adicionar vai duplicar as quantidades.` : '',
+          hasWarn: dup || covered,
+          dup,
+          addLabel: covered ? 'Adicionar mesmo assim' : 'Adicionar à carteira',
+          add: () => { const { file, ...rest } = n; this.saveNotes([...s.notes, rest]); this.setState(st => ({ pending: st.pending.filter((_, j) => j !== i) })); },
+          discard: () => this.setState(st => ({ pending: st.pending.filter((_, j) => j !== i) }))
+        };
+      }),
+      hasNotes: s.notes.length > 0,
+      notes: s.notes.map(n => ({
+        nota: n.nota, data: fmtDate(n.data),
+        resumo: n.trades.map(t => `${t.cv} ${t.q.toLocaleString('pt-BR')} ${t.tk}`).join(' · '),
+        total: brl.format(n.trades.reduce((a, t) => a + t.v, 0)),
+        remove: () => this.saveNotes(s.notes.filter(x => x.nota !== n.nota))
+      })),
+      realizedTotal: sgnBrl(all.reduce((a, p) => a + p.realized, 0)),
+      sum: {
+        saldo: brl.format(total), cost: brl.format(all.reduce((a, p) => a + p.bv - p.sv, 0)),
+        costMeta: `${brl.format(all.reduce((a, p) => a + p.bv, 0))} em compras − ${brl.format(all.reduce((a, p) => a + p.sv, 0))} em vendas`,
+        rentPct: pCost ? sgnPct(pSaldo / pCost - 1) : '—',
+        rentBrl: sgnBrl(pSaldo - pCost),
+        pricedLabel: `${priced.length} de ${live.length} ativos com último preço`,
+        count: live.length,
+        zeroedLabel: zeroed ? `${zeroed} zerados fora do cálculo` : 'Nenhum ativo zerado'
+      },
+      classes,
+      filters: ['Todos', ...CLS].map(c => ({ label: c, active: s.cls === c, pick: () => this.setState({ cls: c }) })),
+      q: s.q, onQ: e => this.setState({ q: e.target.value }),
+      zeroedBtn: showZeroed ? 'Ocultar zerados' : `Mostrar zerados (${zeroed})`,
+      toggleZeroed: () => this.setState({ showZeroed: !showZeroed }),
+      sortBy: Object.fromEntries(keys.map(k => [k, mk(k)])),
+      arrows: Object.fromEntries(keys.map(k => [k, ar(k)])),
+      rows, empty: s.tx.length > 0 && rows.length === 0,
+      dlg: s.dlg,
+      openDlg: () => this.setState({ dlg: true, pasteMsg: '' }),
+      closeDlg: () => this.setState({ dlg: false }),
+      stop: e => e.stopPropagation(),
+      paste: s.paste, pasteMsg: s.pasteMsg,
+      onPaste: e => this.setState({ paste: e.target.value }),
+      applyPaste: () => {
+        const known = new Set(all.map(p => p.t));
+        const ov = { ...s.ov }; let n = 0; const miss = [];
+        for (const line of s.paste.split(/\n/)) {
+          const m = line.toUpperCase().match(/([A-Z]{4}\d{1,2})\D+?([\d.,]+)/);
+          if (!m) continue;
+          if (!known.has(m[1])) { miss.push(m[1]); continue; }
+          ov[m[1]] = { ...(ov[m[1]] || {}), price: m[2] }; n++;
+        }
+        this.saveOv(ov);
+        this.setState({ pasteMsg: `${n} preço(s) aplicado(s)` + (miss.length ? `. Não encontrados: ${miss.join(', ')}` : ''), dlg: miss.length > 0, paste: miss.length ? s.paste : '' });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>
